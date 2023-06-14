@@ -1,0 +1,43 @@
+# Design Database
+
+## person
+- id
+- name
+- image (nullable)
+- timestamp
+
+## transaction
+- id
+- person_id
+- title
+- amount
+- description (nullable)
+- start_date
+- end_date 
+- file (nullable)
+- type (enum [hutang, piutang])
+- timestamp
+
+## transaction_payment
+- id
+- transaction_id
+- person_id
+- amount
+- description (nullable)
+- file (nullable)
+- timestamp (created_at, updated_at)
+
+## transaction_payment_revision
+
+# Router
+1. Splash Page
+2. Welcome Page
+    2.1. Home Page (feat from top to bot)
+        2.1.1. Search bar & Profile
+        2.1.2. Summary Hutang & Piutang
+        2.1.3. Recent Transaction
+    2.2. Saved Page
+    2.3. Form Transaction Page
+    2.4. Transaction Page
+        2.4.1. Transaction Detail Page
+    2.5. Setting Page
