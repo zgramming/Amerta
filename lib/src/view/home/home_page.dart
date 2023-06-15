@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:intl/intl.dart';
 
 import '../../injection.dart';
 import '../../utils/colors.dart';
 import '../../utils/fonts.dart';
+import '../../utils/functions.dart';
 import '../widgets/transaction_list_item.dart';
 
 class HomePage extends StatelessWidget {
@@ -100,31 +100,19 @@ class RecentTransactionHeader extends StatelessWidget {
 }
 
 class DebtInfo extends ConsumerWidget {
-  const DebtInfo({
-    super.key,
-  });
+  const DebtInfo({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final future = ref.watch(getSummaryTransaction);
     return future.when(
       data: (summary) {
-        final formatHutangCurrency = NumberFormat.simpleCurrency(
-          locale: "id_ID",
-          decimalDigits: 0,
-          name: "Rp ",
-        ).format(summary.totalHutang);
-        final formatPiutangCurrency = NumberFormat.simpleCurrency(
-          locale: "id_ID",
-          decimalDigits: 0,
-          name: "Rp ",
-        ).format(summary.totalPiutang);
-
-        final formatTotalTransaksi = NumberFormat.simpleCurrency(
-          locale: "id_ID",
-          decimalDigits: 0,
-          name: "Rp ",
-        ).format(summary.totalTransaction);
+        final formatHutangCurrency = FunctionUtils.convertToIDR(
+          summary.totalHutang,
+        );
+        final formatPiutangCurrency = FunctionUtils.convertToIDR(
+          summary.totalPiutang,
+        );
 
         return Card(
           margin: const EdgeInsets.symmetric(horizontal: 24.0),

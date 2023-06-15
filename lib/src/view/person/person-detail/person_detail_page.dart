@@ -1,16 +1,17 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
-import 'package:amerta/src/injection.dart';
-import 'package:amerta/src/utils/enums.dart';
-import 'package:amerta/src/view/widgets/transaction_info_row.dart';
 import 'package:intl/intl.dart';
 
+import '../../../injection.dart';
+import '../../../model/model/parameter_transaction_by_person_type_model.dart';
 import '../../../utils/colors.dart';
+import '../../../utils/enums.dart';
 import '../../../utils/fonts.dart';
+import '../../widgets/transaction_info_row.dart';
 import '../../widgets/transaction_list_item.dart';
-import 'widgets/modal_print_transaction.dart';
+import 'widgets/modal_print_transaction_person_detail.dart';
 
 class PersonDetailPage extends ConsumerStatefulWidget {
   const PersonDetailPage({
@@ -73,7 +74,9 @@ class _PersonDetailPageState extends ConsumerState<PersonDetailPage>
                           context: context,
                           backgroundColor: Colors.transparent,
                           builder: (context) =>
-                              ModalPrintTransaction(personId: widget.id),
+                              ModalPrintTransactionPersonDetail(
+                            personId: widget.id,
+                          ),
                         );
                       },
                     ),
@@ -110,8 +113,10 @@ class _PersonDetailPageState extends ConsumerState<PersonDetailPage>
                   top: false,
                   bottom: false,
                   child: Builder(
-                    builder: (BuildContext context) =>
-                        TransactionByTypeList(type: type),
+                    builder: (BuildContext context) => TransactionByTypeList(
+                      personId: widget.id,
+                      type: type,
+                    ),
                   ),
                 );
               }).toList(),
@@ -240,13 +245,19 @@ class TransactionByTypeList extends ConsumerWidget {
   const TransactionByTypeList({
     Key? key,
     required this.type,
+    required this.personId,
   }) : super(key: key);
 
   final TypeTransaction type;
+  final int personId;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final futureTransaction = ref.watch(getTransactionByType(type));
+    final model = ParameterTransactionByPersonTypeModel(
+      personId: personId,
+      type: type,
+    );
+    final futureTransaction = ref.watch(getTransactionByType(model));
     return futureTransaction.when(
       data: (transactions) {
         if (transactions.isEmpty) {

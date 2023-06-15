@@ -4,18 +4,26 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'model/database/database.dart';
 import 'model/database/helper.dart';
+import 'model/model/parameter_transaction_by_person_type_model.dart';
 import 'model/model/payment_model.dart';
 import 'model/model/person_model.dart';
-import 'model/model/person_summary_transaction.dart';
+import 'model/model/person_summary_transaction_model.dart';
 import 'model/model/transaction_detail_model.dart';
 import 'model/model/transaction_model.dart';
 import 'model/model/transaction_summary_model.dart';
+import 'model/repository/payment_repository.dart';
+import 'model/repository/pdf_report_repository.dart';
+import 'model/repository/person_repository.dart';
+import 'model/repository/transaction_repository.dart';
 import 'model/service/payment_service.dart';
 import 'model/service/pdf_report_service.dart';
 import 'model/service/person_service.dart';
 import 'model/service/transaction_service.dart';
-import 'utils/enums.dart';
+import 'view_model/payment_notifier.dart';
+import 'view_model/pdf_report_notifier.dart';
+import 'view_model/person_notifier.dart';
 import 'view_model/shared/shared_provider.dart';
+import 'view_model/transaction_notifier.dart';
 
 // Future Provider
 // Section 1: Transaction
@@ -41,11 +49,14 @@ final getRecentTransaction =
   );
 });
 
-final getTransactionByType =
-    AutoDisposeFutureProviderFamily<List<TransactionModel>, TypeTransaction>(
-        (ref, type) async {
+final getTransactionByType = AutoDisposeFutureProviderFamily<
+    List<TransactionModel>,
+    ParameterTransactionByPersonTypeModel>((ref, param) async {
   final repo = ref.watch(_transactionRepository);
-  final result = await repo.getTransactionByType(type: type);
+  final result = await repo.getTransactionByPersonAndType(
+    param.personId,
+    type: param.type,
+  );
   return result.fold(
     (l) => throw l.message,
     (r) => r,
@@ -67,7 +78,7 @@ final getSummaryTransaction =
 // Section 2: Person
 
 final getPersonSummaryTransaction =
-    AutoDisposeFutureProviderFamily<PersonSummaryTransaction, int>(
+    AutoDisposeFutureProviderFamily<PersonSummaryTransactionModel, int>(
         (ref, personId) async {
   final repo = ref.watch(_personRepository);
   final result = await repo.getSummaryTransaction(personId);

@@ -1,16 +1,12 @@
-import 'dart:developer';
-
-import 'package:amerta/src/view_model/shared/shared_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
-import 'package:amerta/src/utils/enums.dart';
-
 import '../../injection.dart';
 import '../../utils/colors.dart';
+import '../../utils/enums.dart';
 import '../../utils/fonts.dart';
 import '../../utils/functions.dart';
 import '../../utils/routers.dart';
@@ -125,17 +121,11 @@ class _TransactionListItemPerson extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Icon(
-          Icons.person_outline,
-          size: 10.sp,
-        ),
+        Icon(Icons.person_outline, size: 10.sp),
         SizedBox(width: 4.w),
         Text(
           personName,
-          style: lato.copyWith(
-            fontSize: 10.sp,
-            color: Colors.grey,
-          ),
+          style: lato.copyWith(fontSize: 10.sp, color: Colors.grey),
         ),
       ],
     );

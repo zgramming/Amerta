@@ -1,22 +1,19 @@
-import 'package:amerta/src/utils/functions.dart';
-import 'package:amerta/src/utils/routers.dart';
+import 'package:amerta/src/utils/enums.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import 'package:amerta/src/injection.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../model/model/pdf_report_filter_model.dart';
-import '../../../../utils/enums.dart';
-import 'print_transaction_tile.dart';
+import 'package:amerta/src/injection.dart';
 
-class ModalPrintTransaction extends ConsumerWidget {
-  const ModalPrintTransaction({
+import '../../../model/model/pdf_report_filter_model.dart';
+import '../../../utils/functions.dart';
+import '../../../utils/routers.dart';
+import '../../widgets/print_transaction_tile.dart';
+
+class ModalPrintTransactionPerson extends ConsumerWidget {
+  const ModalPrintTransactionPerson({
     super.key,
-    required this.personId,
   });
-
-  final int personId;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -35,11 +32,8 @@ class ModalPrintTransaction extends ConsumerWidget {
             icon: Icons.upcoming_rounded,
             onTap: () async {
               final notifier = ref.read(pdfReportNotifier.notifier);
-              await notifier.generateReportByPerson(
-                personId,
-                filter: const PDFReportFilterModel(
-                  type: PrintTrxType.hutang,
-                ),
+              await notifier.generateAllReport(
+                filter: const PDFReportFilterModel(type: PrintTrxType.hutang),
                 onSuccess: (file) {
                   context.pop();
                   context.pushNamed(previewPDFRoute, extra: file);
@@ -60,11 +54,8 @@ class ModalPrintTransaction extends ConsumerWidget {
             icon: Icons.outbond_rounded,
             onTap: () async {
               final notifier = ref.read(pdfReportNotifier.notifier);
-              await notifier.generateReportByPerson(
-                personId,
-                filter: const PDFReportFilterModel(
-                  type: PrintTrxType.piutang,
-                ),
+              await notifier.generateAllReport(
+                filter: const PDFReportFilterModel(type: PrintTrxType.piutang),
                 onSuccess: (file) {
                   context.pop();
                   context.pushNamed(previewPDFRoute, extra: file);
@@ -85,11 +76,8 @@ class ModalPrintTransaction extends ConsumerWidget {
             icon: Icons.handshake_outlined,
             onTap: () async {
               final notifier = ref.read(pdfReportNotifier.notifier);
-              await notifier.generateReportByPerson(
-                personId,
-                filter: const PDFReportFilterModel(
-                  type: PrintTrxType.all,
-                ),
+              await notifier.generateAllReport(
+                filter: const PDFReportFilterModel(type: PrintTrxType.all),
                 onSuccess: (file) {
                   context.pop();
                   context.pushNamed(previewPDFRoute, extra: file);

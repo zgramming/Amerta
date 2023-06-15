@@ -1,15 +1,15 @@
-import 'package:amerta/src/injection.dart';
 import 'package:flutter/material.dart';
-
-import 'package:amerta/src/model/model/person_model.dart';
-import 'package:amerta/src/utils/fonts.dart';
-import 'package:amerta/src/utils/functions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../injection.dart';
+import '../../model/model/person_model.dart';
+import '../../utils/fonts.dart';
+import '../../utils/functions.dart';
 import '../../utils/routers.dart';
 import '../../utils/styles.dart';
 import 'widgets/modal_action_person.dart';
+import 'widgets/modal_print_transaction_person.dart';
 
 class PersonPage extends StatelessWidget {
   const PersonPage({super.key});
@@ -193,6 +193,15 @@ class _PersonHeader extends StatelessWidget {
               keyboardType: TextInputType.text,
               textInputAction: TextInputAction.search,
             ),
+          ),
+          IconButton(
+            onPressed: () async {
+              await showModalBottomSheet(
+                  context: context,
+                  backgroundColor: Colors.transparent,
+                  builder: (context) => const ModalPrintTransactionPerson());
+            },
+            icon: const Icon(Icons.print),
           ),
         ],
       ),

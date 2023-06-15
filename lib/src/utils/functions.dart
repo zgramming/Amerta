@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:amerta/src/model/model/pdf_report_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -9,6 +8,8 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 
+import '../model/model/pdf_report_model.dart';
+import 'constant.dart';
 import 'enums.dart';
 
 class FunctionUtils {
@@ -48,7 +49,8 @@ class FunctionUtils {
 
   static getFirstLetters(String fullName) {
     // Split the string into words
-    List<String> words = fullName.split(' ');
+    List<String> words =
+        fullName.split(' ').where((element) => element.isNotEmpty).toList();
 
     if (words.isEmpty) {
       return fullName.substring(0, 1).toUpperCase();
@@ -158,8 +160,7 @@ class FunctionUtils {
     required List<PDFReportModel> transactions,
   }) async {
     final doc = pw.Document();
-    final byteLogo =
-        await rootBundle.load('assets/images/logo-no-background.png');
+    final byteLogo = await rootBundle.load(pathLogo);
     final logo = byteLogo.buffer.asUint8List(
       byteLogo.offsetInBytes,
       byteLogo.lengthInBytes,
@@ -170,11 +171,7 @@ class FunctionUtils {
       return pw.Row(
         mainAxisAlignment: pw.MainAxisAlignment.center,
         children: [
-          pw.Image(
-            pw.MemoryImage(logo),
-            width: 120,
-            height: 120,
-          ),
+          pw.Image(pw.MemoryImage(logo), width: 60, height: 60),
           pw.Expanded(
             child: pw.Text(
               "REPORT TRANSACTION",
@@ -245,6 +242,16 @@ class FunctionUtils {
                 color: PdfColors.grey600,
                 fontWeight: pw.FontWeight.bold,
               ),
+              columnWidths: {
+                0: const pw.FlexColumnWidth(1),
+                1: const pw.FlexColumnWidth(2),
+                2: const pw.FlexColumnWidth(2),
+                3: const pw.FlexColumnWidth(2),
+                4: const pw.FlexColumnWidth(1),
+                5: const pw.FlexColumnWidth(2),
+                6: const pw.FlexColumnWidth(2),
+                7: const pw.FlexColumnWidth(2),
+              },
               headerAlignments: {
                 0: pw.Alignment.centerLeft,
                 1: pw.Alignment.centerLeft,
@@ -295,8 +302,8 @@ class FunctionUtils {
                     transaction.amount - transaction.paid,
                   );
                   final type = transaction.type == TypeTransaction.hutang
-                      ? "Hutang"
-                      : "Piutang";
+                      ? "HTG"
+                      : "PTG";
 
                   return [
                     (index + 1).toString(),

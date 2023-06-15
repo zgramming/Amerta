@@ -1,15 +1,15 @@
 import 'dart:developer';
 
-import 'package:amerta/src/model/model/form_transaction_model.dart';
-import 'package:amerta/src/model/model/pdf_report_filter_model.dart';
-import 'package:amerta/src/model/model/pdf_report_model.dart';
 import 'package:drift/drift.dart';
 
 import '../../utils/enums.dart';
 import '../model/form_payment_model.dart';
+import '../model/form_transaction_model.dart';
 import '../model/payment_model.dart';
+import '../model/pdf_report_filter_model.dart';
+import '../model/pdf_report_model.dart';
 import '../model/person_model.dart';
-import '../model/person_summary_transaction.dart';
+import '../model/person_summary_transaction_model.dart';
 import '../model/transaction_detail_model.dart';
 import '../model/transaction_filter_model.dart';
 import '../model/transaction_model.dart';
@@ -24,6 +24,64 @@ class DatabaseHelper {
   });
 
   // PDF Report Section
+
+  Future<List<PDFReportModel>> getAllReportPDF({
+    required PDFReportFilterModel filter,
+  }) async {
+    String filterQuery = "";
+
+    if (filter.type == PrintTrxType.hutang) {
+      filterQuery = "AND t.type = 'hutang'";
+    } else if (filter.type == PrintTrxType.piutang) {
+      filterQuery = "AND t.type = 'piutang'";
+    }
+
+    final query = database.customSelect(
+      """
+      SELECT 
+        t.id,
+        t.title,
+        t.type,
+        t.amount,
+        t.description,
+        t.start_date,
+        t.end_date,
+        t.created_at,
+        t.updated_at,
+        p.id as person_id,
+        p.name as person_name,
+        (SELECT COALESCE(SUM(amount), 0) FROM payment WHERE transaction_id = t.id) as payment_amount
+      FROM "transaction" t
+      INNER JOIN person p ON p.id = t.person_id
+      WHERE t.id IS NOT NULL
+      $filterQuery
+""",
+      readsFrom: {
+        database.transactionTable,
+        database.personTable,
+        database.paymentTable,
+      },
+    );
+
+    final result = await query.get();
+
+    final mapping = result
+        .map(
+          (e) => PDFReportModel(
+            title: e.read<String>("title"),
+            personName: e.read<String>("person_name"),
+            amount: e.read<double>("amount"),
+            startDate: e.read<DateTime>("start_date"),
+            endDate: e.read<DateTime>("end_date"),
+            type: e.read<String>("type") == "hutang"
+                ? TypeTransaction.hutang
+                : TypeTransaction.piutang,
+            paid: e.read<double?>("payment_amount") ?? 0,
+          ),
+        )
+        .toList();
+    return mapping;
+  }
 
   Future<List<PDFReportModel>> getReportPDFByPerson(
     int personId, {
@@ -311,8 +369,11 @@ class DatabaseHelper {
     return mapping;
   }
 
-  Future<List<TransactionModel>> getTransactionByType(
-      TypeTransaction type) async {
+  Future<List<TransactionModel>> getTransactionByPersonAndType(
+    int personId, {
+    required TypeTransaction type,
+  }) async {
+    final isHutang = type == TypeTransaction.hutang;
     final query = database.select(database.transactionTable).join([
       innerJoin(
         database.personTable,
@@ -321,11 +382,9 @@ class DatabaseHelper {
         ),
       )
     ])
-      ..where(
-        database.transactionTable.type.equals(
-          type == TypeTransaction.hutang ? "hutang" : "piutang",
-        ),
-      )
+      ..where(database.transactionTable.type
+          .equals(isHutang ? "hutang" : "piutang"))
+      ..where(database.transactionTable.personId.equals(personId))
       ..orderBy(
         [
           OrderingTerm.desc(database.transactionTable.updatedAt),
@@ -577,7 +636,7 @@ class DatabaseHelper {
     return mapping;
   }
 
-  Future<PersonSummaryTransaction> getPersonSummaryTransaction(
+  Future<PersonSummaryTransactionModel> getPersonSummaryTransaction(
     int personId,
   ) async {
     final query = database.customSelect(
@@ -612,7 +671,7 @@ class DatabaseHelper {
     final totalCountHutang = result.read<int?>("total_count_hutang") ?? 0;
     final totalCountPiutang = result.read<int?>("total_count_piutang") ?? 0;
 
-    final mapping = PersonSummaryTransaction(
+    final mapping = PersonSummaryTransactionModel(
       personId: personId0,
       personName: personName,
       totalAmountHutang: totalAmountHutang,
@@ -627,7 +686,7 @@ class DatabaseHelper {
   Future<int> savePerson(PersonModel person) async {
     final query = database.into(database.personTable).insert(
           PersonTableCompanion(
-            name: Value(person.name),
+            name: Value(person.name.trim()),
             createdAt: Value(person.createdAt),
             updatedAt: Value(person.updatedAt),
           ),
@@ -643,7 +702,7 @@ class DatabaseHelper {
 
     final result = await query.write(
       PersonTableCompanion(
-        name: Value(person.name),
+        name: Value(person.name.trim()),
         updatedAt: Value(person.updatedAt),
       ),
     );

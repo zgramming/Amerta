@@ -1,7 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:equatable/equatable.dart';
 
-class PersonSummaryTransaction extends Equatable {
+class PersonSummaryTransactionModel extends Equatable {
   final int personId;
   final String personName;
   final double totalAmountHutang;
@@ -9,7 +9,7 @@ class PersonSummaryTransaction extends Equatable {
   final int totalCountHutang;
   final int totalCountPiutang;
 
-  const PersonSummaryTransaction({
+  const PersonSummaryTransactionModel({
     required this.totalAmountHutang,
     required this.totalAmountPiutang,
     required this.totalCountHutang,
@@ -33,7 +33,7 @@ class PersonSummaryTransaction extends Equatable {
   @override
   bool get stringify => true;
 
-  PersonSummaryTransaction copyWith({
+  PersonSummaryTransactionModel copyWith({
     double? totalAmountHutang,
     double? totalAmountPiutang,
     int? totalCountHutang,
@@ -41,7 +41,7 @@ class PersonSummaryTransaction extends Equatable {
     int? personId,
     String? personName,
   }) {
-    return PersonSummaryTransaction(
+    return PersonSummaryTransactionModel(
       totalAmountHutang: totalAmountHutang ?? this.totalAmountHutang,
       totalAmountPiutang: totalAmountPiutang ?? this.totalAmountPiutang,
       totalCountHutang: totalCountHutang ?? this.totalCountHutang,
