@@ -1,13 +1,13 @@
 import 'dart:io';
 
-import 'package:amerta/src/view/person/person-detail/person_detail_page.dart';
-import 'package:amerta/src/view/preview-pdf/preview_pdf_page.dart';
-import 'package:amerta/src/view/transaction/transaction-detail/payment/form_page_payment.dart';
 import 'package:go_router/go_router.dart';
 
 import '../view/form-person/form_person_page.dart';
 import '../view/form-transaction/form_transaction_page.dart';
+import '../view/person/person-detail/person_detail_page.dart';
+import '../view/preview-pdf/preview_pdf_page.dart';
 import '../view/splash_page.dart';
+import '../view/transaction/transaction-detail/payment/form_page_payment.dart';
 import '../view/transaction/transaction-detail/transaction_detail_page.dart';
 import '../view/welcome_page.dart';
 

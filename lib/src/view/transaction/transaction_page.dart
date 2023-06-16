@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:amerta/src/utils/styles.dart';
-
 import '../../injection.dart';
 import '../../utils/routers.dart';
+import '../../utils/styles.dart';
 import '../widgets/transaction_list_item.dart';
 import 'widgets/modal_transaction_filter.dart';
 

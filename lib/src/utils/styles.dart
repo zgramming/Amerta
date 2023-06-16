@@ -1,8 +1,8 @@
-import 'package:amerta/src/utils/fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'colors.dart';
+import 'fonts.dart';
 
 ButtonStyle elevatedButtonStyle({
   Color? backgroundColor,

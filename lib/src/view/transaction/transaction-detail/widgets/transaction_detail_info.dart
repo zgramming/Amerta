@@ -1,13 +1,12 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'package:amerta/src/utils/functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 
-import 'package:amerta/src/utils/enums.dart';
-
 import '../../../../utils/colors.dart';
+import '../../../../utils/enums.dart';
 import '../../../../utils/fonts.dart';
+import '../../../../utils/functions.dart';
 import '../../../widgets/transaction_info_row.dart';
 
 class TransactionDetailInfo extends StatelessWidget {

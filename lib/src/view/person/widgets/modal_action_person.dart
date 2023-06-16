@@ -1,10 +1,10 @@
-import 'package:amerta/src/injection.dart';
-import 'package:amerta/src/utils/routers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../injection.dart';
 import '../../../model/model/person_model.dart';
+import '../../../utils/routers.dart';
 
 class ModalActionPerson extends ConsumerWidget {
   const ModalActionPerson({

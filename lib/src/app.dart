@@ -1,5 +1,5 @@
-import 'package:amerta/src/utils/fonts.dart';
-import 'package:amerta/src/utils/routers.dart';
+import 'utils/fonts.dart';
+import 'utils/routers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 

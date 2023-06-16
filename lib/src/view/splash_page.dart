@@ -1,7 +1,8 @@
-import 'package:amerta/src/utils/colors.dart';
-import 'package:amerta/src/utils/routers.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+
+import '../utils/colors.dart';
+import '../utils/routers.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});

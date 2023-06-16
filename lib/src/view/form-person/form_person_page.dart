@@ -1,16 +1,15 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import 'package:amerta/src/injection.dart';
-import 'package:amerta/src/utils/functions.dart';
-import 'package:amerta/src/utils/styles.dart';
-import 'package:amerta/src/view/widgets/form_body.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../injection.dart';
 import '../../model/model/person_model.dart';
 import '../../utils/fonts.dart';
+import '../../utils/functions.dart';
+import '../../utils/styles.dart';
+import '../widgets/form_body.dart';
 
 class FormPersonPage extends ConsumerStatefulWidget {
   const FormPersonPage({

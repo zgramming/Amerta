@@ -1,4 +1,3 @@
-import 'package:amerta/src/view_model/shared/shared_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -7,6 +6,7 @@ import 'package:intl/intl.dart';
 
 import '../../../utils/functions.dart';
 import '../../../utils/styles.dart';
+import '../../../view_model/shared/shared_provider.dart';
 import '../../widgets/form_body.dart';
 
 class ModalFilterTransaction extends ConsumerStatefulWidget {

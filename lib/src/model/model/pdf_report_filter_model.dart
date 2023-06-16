@@ -1,7 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:equatable/equatable.dart';
 
-import 'package:amerta/src/utils/enums.dart';
+import '../../utils/enums.dart';
 
 class PDFReportFilterModel extends Equatable {
   final PrintTrxType type;
