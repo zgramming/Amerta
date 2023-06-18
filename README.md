@@ -1,10 +1,23 @@
 <p align="center">
-<img src="assets/images/logo.png" height="300"/>
+    <img src="assets/images/logo.png" height="300"/>
 </p>
 
-<img src="https://ci.appveyor.com/api/projects/status/32r7s2skrgm9ubva?svg=true" alt="Project Badge" width="100">
-<img src="https://img.shields.io/github/followers/zgramming?style=social" alt="Project Badge" width="100">
-<a href="https://play.google.com/store/apps/details?id=zeffry.reynando.amerta.amerta"><img src="assets/images/google-playstore.png" alt="Project Badge" width="80"></a>
+<table cellspacing="0" cellpadding="0" border="0">
+    <tbody>          
+        <tr>
+            <td align="center">
+                <img src="https://ci.appveyor.com/api/projects/status/32r7s2skrgm9ubva?svg=true" alt="Project Badge" width="100">
+            </td>
+            <td align="center">
+                <img src="https://img.shields.io/github/followers/zgramming?style=social" alt="Project Badge" width="100">
+            </td>
+            <td align="center">
+                <a href="https://play.google.com/store/apps/details?id=zeffry.reynando.amerta.amerta"><img src="assets/images/google-playstore.png" alt="Project Badge" width="80"></a>
+            </td>
+        </tr>
+    </tbody>
+
+</table>
 
 # Amerta
 
