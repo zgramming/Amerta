@@ -52,19 +52,19 @@ Aplikasi management Hutang & Piutang support report PDF
 <table>
     <tbody>
         <tr>
+            <td align="center" style="font-weight:bold;">Home</td>
             <td align="center" style="font-weight:bold;">List People</td>
             <td align="center" style="font-weight:bold;">List Transaction</td>
-            <td align="center" style="font-weight:bold;">Home</td>
         </tr>
         <tr>
+            <td align="center">
+                <img src="assets/screenshot/3.home.png" height="400"/>
+            </td>
             <td align="center">
                 <img src="assets/screenshot/1.people-list.png" height="400"/>
             </td>
             <td align="center">
                 <img src="assets/screenshot/2.transaction-list.png" height="400"/>
-            </td>
-            <td align="center">
-                <img src="assets/screenshot/3.home.png" height="400"/>
             </td>
         </tr>
         <!-- New Row -->
