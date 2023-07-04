@@ -58,8 +58,12 @@ class _FormPagePaymentState extends ConsumerState<FormPagePayment> {
       await notifier.update(model);
     }
 
-    // reload provider
-    ref.invalidate(getTransactionById(widget.transactionId));
+    if (mounted) {
+      /// Reload Provider
+      ref.invalidate(getRecentTransaction);
+      ref.invalidate(getSummaryTransaction);
+      ref.invalidate(getTransactionById(widget.transactionId));
+    }
   }
 
   @override

@@ -24,7 +24,7 @@ ButtonStyle outlineButtonStyle({
 }) =>
     OutlinedButton.styleFrom(
       padding: padding ?? const EdgeInsets.all(16.0),
-      // backgroundColor: backgroundColor ?? primary,
+      backgroundColor: backgroundColor ?? primary,
       shape: RoundedRectangleBorder(
         borderRadius: radius ?? BorderRadius.circular(10.0),
       ),

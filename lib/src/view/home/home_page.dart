@@ -1,3 +1,4 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -6,30 +7,8 @@ import '../../injection.dart';
 import '../../utils/colors.dart';
 import '../../utils/fonts.dart';
 import '../../utils/functions.dart';
+import '../../utils/styles.dart';
 import '../widgets/transaction_list_item.dart';
-
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            SizedBox(height: 20.h),
-            const DebtInfo(),
-            SizedBox(height: 20.h),
-            const RecentTransactionHeader(),
-            const RecentTransactionList(),
-            SizedBox(height: 20.h),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class RecentTransactionList extends ConsumerWidget {
   const RecentTransactionList({super.key});
@@ -99,38 +78,118 @@ class RecentTransactionHeader extends StatelessWidget {
   }
 }
 
-class DebtInfo extends ConsumerWidget {
-  const DebtInfo({super.key});
+class _DebtInfo extends ConsumerStatefulWidget {
+  const _DebtInfo();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_DebtInfo> createState() => _DebtInfoState();
+}
+
+class _DebtInfoState extends ConsumerState<_DebtInfo> {
+  bool withPayment = true;
+
+  double getPercentage(double value, double total) {
+    return double.parse(((value / total) * 100).toStringAsFixed(2));
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final future = ref.watch(getSummaryTransaction);
     return future.when(
       data: (summary) {
-        final formatHutangCurrency = FunctionUtils.convertToIDR(
-          summary.totalHutang,
-        );
-        final formatPiutangCurrency = FunctionUtils.convertToIDR(
-          summary.totalPiutang,
-        );
+        final hutang =
+            withPayment ? summary.totalHutangWithPayment : summary.totalHutang;
+        final piutang = withPayment
+            ? summary.totalPiutangWithPayment
+            : summary.totalPiutang;
+        final accumulated = hutang + piutang;
 
         return Card(
           margin: const EdgeInsets.symmetric(horizontal: 24.0),
           color: primary,
           child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Row(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                DebtInfoDetail(
-                  title: "Total Hutang",
-                  value: formatHutangCurrency,
-                  icon: Icons.upcoming_rounded,
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          _DebtInfoDetail(
+                            title: "HUTANG",
+                            value: FunctionUtils.convertToIDR(hutang),
+                            icon: Icons.upcoming_rounded,
+                          ),
+                          const SizedBox(height: 20.0),
+                          _DebtInfoDetail(
+                            title: "PIUTANG",
+                            value: FunctionUtils.convertToIDR(piutang),
+                            icon: Icons.outbond_rounded,
+                          ),
+                          const SizedBox(height: 20.0),
+                          _DebtInfoDetail(
+                            title: "AKUMULASI",
+                            value: FunctionUtils.convertToIDR(accumulated),
+                            icon: Icons.balance,
+                          ),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: AspectRatio(
+                        aspectRatio: 1,
+                        child: PieChart(
+                          PieChartData(
+                            sections: [
+                              PieChartSectionData(
+                                color: Colors.red[300],
+                                value: hutang,
+                                title:
+                                    "HTG ${getPercentage(hutang, accumulated)}%",
+                                radius: 50.r,
+                                titleStyle: latoWhite.copyWith(
+                                  fontSize: 8.sp,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              PieChartSectionData(
+                                color: Colors.green[300],
+                                value: piutang,
+                                title:
+                                    "PTG ${getPercentage(piutang, accumulated)}%",
+                                radius: 50.r,
+                                titleStyle: latoWhite.copyWith(
+                                  fontSize: 8.sp,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 10.0),
-                DebtInfoDetail(
-                  title: "Total Piutang",
-                  value: formatPiutangCurrency,
-                  icon: Icons.outbond_rounded,
+                const SizedBox(height: 10.0),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    setState(() {
+                      withPayment = !withPayment;
+                    });
+                  },
+                  icon: Icon(
+                    withPayment ? Icons.visibility : Icons.visibility_off,
+                    color: primary,
+                  ),
+                  style: elevatedButtonStyle(
+                      padding: const EdgeInsets.all(0),
+                      backgroundColor: Colors.white),
+                  label: Text(
+                    withPayment ? "Tanpa Pembayaran" : "Dengan Pembayaran",
+                  ),
                 ),
               ],
             ),
@@ -155,8 +214,8 @@ class DebtInfo extends ConsumerWidget {
   }
 }
 
-class DebtInfoDetail extends StatelessWidget {
-  const DebtInfoDetail({
+class _DebtInfoDetail extends StatelessWidget {
+  const _DebtInfoDetail({
     Key? key,
     required this.title,
     required this.value,
@@ -169,41 +228,61 @@ class DebtInfoDetail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          CircleAvatar(
-            backgroundColor: Colors.white,
-            radius: 15.r,
-            child: Icon(
-              icon,
-              color: primary,
-            ),
+    return Row(
+      children: [
+        CircleAvatar(
+          backgroundColor: Colors.white,
+          radius: 15.r,
+          child: Icon(
+            icon,
+            color: primary,
           ),
-          const SizedBox(width: 10.0),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  title,
-                  style: latoWhite.copyWith(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 10.sp,
-                  ),
+        ),
+        const SizedBox(width: 10.0),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                title,
+                style: latoWhite.copyWith(
+                  fontWeight: FontWeight.normal,
+                  fontSize: 8.sp,
                 ),
-                SizedBox(height: 8.0.h),
-                FittedBox(
-                  child: Text(
-                    value,
-                    style: latoWhite.copyWith(fontWeight: FontWeight.w300),
-                  ),
+              ),
+              const SizedBox(height: 5.0),
+              FittedBox(
+                child: Text(
+                  value,
+                  style: latoWhite.copyWith(fontWeight: FontWeight.bold),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
+        ),
+      ],
+    );
+  }
+}
+
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SizedBox(height: 20.h),
+            const _DebtInfo(),
+            SizedBox(height: 20.h),
+            const RecentTransactionHeader(),
+            const RecentTransactionList(),
+            SizedBox(height: 20.h),
+          ],
+        ),
       ),
     );
   }

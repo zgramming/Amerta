@@ -466,7 +466,9 @@ class DatabaseHelper {
       SUM(CASE WHEN t.type = 'hutang' THEN t.amount ELSE 0 END) as total_amount_hutang,
       SUM(CASE WHEN t.type = 'piutang' THEN t.amount ELSE 0 END) as total_amount_piutang,
       SUM(t.amount) as total_transaction,
-      COUNT(t.id) as count_transaction
+      COUNT(t.id) as count_transaction,
+      (SELECT SUM(p.amount) FROM payment p INNER JOIN "transaction" trx ON (p.transaction_id = trx.id) WHERE trx.type = 'hutang') as payment_hutang,
+      (SELECT SUM(p.amount) FROM payment p INNER JOIN "transaction" trx ON (p.transaction_id = trx.id) WHERE trx.type = 'piutang') as payment_piutang
     FROM "transaction" t
 """,
       readsFrom: {
@@ -476,11 +478,23 @@ class DatabaseHelper {
 
     final result = await query.getSingle();
 
+    final totalHutang = result.read<double?>("total_amount_hutang") ?? 0;
+    final totalPiutang = result.read<double?>("total_amount_piutang") ?? 0;
+    final totalTransaction = result.read<double?>("total_transaction") ?? 0;
+    final countTransaction = result.read<int>("count_transaction");
+    final paymentHutang = result.read<double?>("payment_hutang") ?? 0;
+    final paymentPiutang = result.read<double?>("payment_piutang") ?? 0;
+
+    final totalHutangWithPayment = totalHutang - paymentHutang;
+    final totalPiutangWithPayment = totalPiutang - paymentPiutang;
+
     final mapping = TransactionSummaryModel(
-      totalHutang: result.read<double?>("total_amount_hutang") ?? 0,
-      totalPiutang: result.read<double?>("total_amount_piutang") ?? 0,
-      totalTransaction: result.read<double?>("total_transaction") ?? 0,
-      countTransaction: result.read<int>("count_transaction"),
+      totalHutang: totalHutang,
+      totalPiutang: totalPiutang,
+      totalTransaction: totalTransaction,
+      countTransaction: countTransaction,
+      totalHutangWithPayment: totalHutangWithPayment,
+      totalPiutangWithPayment: totalPiutangWithPayment,
     );
 
     return mapping;
