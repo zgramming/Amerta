@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -22,6 +23,8 @@ class TransactionListItem extends ConsumerWidget {
     required this.endDate,
     required this.type,
     required this.createdAt,
+    required this.paymentAmount,
+    required this.isPaid,
   }) : super(key: key);
 
   final int id;
@@ -32,11 +35,16 @@ class TransactionListItem extends ConsumerWidget {
   final DateTime endDate;
   final TypeTransaction type;
   final DateTime createdAt;
+  final double paymentAmount;
+  final bool isPaid;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ProviderScope(
       child: Card(
+        shape: BeveledRectangleBorder(
+          borderRadius: BorderRadius.circular(8.0),
+        ),
         child: InkWell(
           borderRadius: BorderRadius.circular(8.0),
           onTap: () {
@@ -52,6 +60,7 @@ class TransactionListItem extends ConsumerWidget {
                 id: id,
                 type: type,
                 createdAt: createdAt,
+                isPaid: isPaid,
               ),
               ListTile(
                 title: _TransactionListItemTitle(title: title),
@@ -194,11 +203,13 @@ class _TransactionListItemHeader extends ConsumerWidget {
     required this.id,
     required this.type,
     required this.createdAt,
+    required this.isPaid,
   }) : super(key: key);
 
   final int id;
   final TypeTransaction type;
   final DateTime createdAt;
+  final bool isPaid;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -222,43 +233,60 @@ class _TransactionListItemHeader extends ConsumerWidget {
         ),
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            children: [
-              CircleAvatar(
-                radius: 10.0.r,
-                backgroundColor: primary,
-                child: FittedBox(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Icon(icon),
+          Expanded(
+            child: Row(
+              children: [
+                CircleAvatar(
+                  radius: 10.0.r,
+                  backgroundColor: primary,
+                  child: FittedBox(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Icon(icon),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 8.0.w),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      typeText,
+                      style: lato.copyWith(
+                        fontSize: 10.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 2.h),
+                    Text(
+                      formatDate.format(createdAt),
+                      style: lato.copyWith(
+                        fontSize: 8.sp,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          if (isPaid) ...[
+            Card(
+              color: Colors.green,
+              child: Padding(
+                padding: const EdgeInsets.all(4.0),
+                child: Text(
+                  "Lunas",
+                  style: lato.copyWith(
+                    fontSize: 8.sp,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
-              SizedBox(width: 8.0.w),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    typeText,
-                    style: lato.copyWith(
-                      fontSize: 10.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 2.h),
-                  Text(
-                    formatDate.format(createdAt),
-                    style: lato.copyWith(
-                      fontSize: 8.sp,
-                      color: Colors.grey,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
+            ),
+          ],
           Builder(builder: (context) {
             return PopupMenuButton(
               onSelected: (value) async {

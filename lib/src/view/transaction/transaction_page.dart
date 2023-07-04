@@ -25,46 +25,54 @@ class TransactionPage extends StatelessWidget {
   }
 }
 
-class TransactionList extends StatelessWidget {
+class TransactionList extends ConsumerWidget {
   const TransactionList({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final futureTransaction = ref.watch(transactionNotifier).items;
     return Expanded(
       child: Stack(
         children: [
-          Consumer(
-            builder: (context, ref, child) {
-              final futureTransaction = ref.watch(transactionNotifier).items;
-              return futureTransaction.when(
-                data: (transactions) {
-                  return ListView.builder(
-                    itemCount: transactions.length,
-                    padding: const EdgeInsets.only(
-                      bottom: 60.0,
-                      left: 16.0,
-                      right: 16.0,
-                    ),
-                    shrinkWrap: true,
-                    itemBuilder: (context, index) {
-                      final transaction = transactions[index];
-                      return TransactionListItem(
-                        id: transaction.id,
-                        title: transaction.title,
-                        amount: transaction.amount,
-                        startDate: transaction.startDate,
-                        endDate: transaction.endDate,
-                        personName: transaction.personName,
-                        type: transaction.typeTransaction,
-                        createdAt: transaction.createdAt,
-                      );
-                    },
-                  );
-                },
-                error: (e, s) => Center(child: Text(e.toString())),
-                loading: () => const Center(child: CircularProgressIndicator()),
-              );
+          RefreshIndicator(
+            onRefresh: () async {
+              ref.invalidate(transactionNotifier);
             },
+            child: Builder(
+              builder: (_) {
+                return futureTransaction.when(
+                  data: (transactions) {
+                    return ListView.builder(
+                      itemCount: transactions.length,
+                      padding: const EdgeInsets.only(
+                        bottom: 60.0,
+                        left: 16.0,
+                        right: 16.0,
+                      ),
+                      shrinkWrap: true,
+                      itemBuilder: (context, index) {
+                        final transaction = transactions[index];
+                        return TransactionListItem(
+                          id: transaction.id,
+                          title: transaction.title,
+                          amount: transaction.amount,
+                          startDate: transaction.startDate,
+                          endDate: transaction.endDate,
+                          personName: transaction.personName,
+                          type: transaction.typeTransaction,
+                          createdAt: transaction.createdAt,
+                          paymentAmount: transaction.paymentAmount,
+                          isPaid: transaction.isPaid,
+                        );
+                      },
+                    );
+                  },
+                  error: (e, s) => Center(child: Text(e.toString())),
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
+                );
+              },
+            ),
           ),
           Positioned(
             right: 10,

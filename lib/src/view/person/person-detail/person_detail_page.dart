@@ -281,6 +281,8 @@ class TransactionByTypeList extends ConsumerWidget {
               personName: transaction.personName,
               startDate: transaction.startDate,
               title: transaction.title,
+              paymentAmount: transaction.paymentAmount,
+              isPaid: transaction.isPaid,
             );
           },
         );

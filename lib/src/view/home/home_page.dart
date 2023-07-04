@@ -10,6 +10,36 @@ import '../../utils/functions.dart';
 import '../../utils/styles.dart';
 import '../widgets/transaction_list_item.dart';
 
+class HomePage extends ConsumerWidget {
+  const HomePage({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return SafeArea(
+      child: RefreshIndicator(
+        onRefresh: () async {
+          ref.invalidate(getRecentTransaction);
+          ref.invalidate(getSummaryTransaction);
+        },
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              SizedBox(height: 20.h),
+              const _DebtInfo(),
+              SizedBox(height: 20.h),
+              const RecentTransactionHeader(),
+              const RecentTransactionList(),
+              SizedBox(height: 20.h),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class RecentTransactionList extends ConsumerWidget {
   const RecentTransactionList({super.key});
 
@@ -35,6 +65,8 @@ class RecentTransactionList extends ConsumerWidget {
                 personName: transaction.personName,
                 type: transaction.typeTransaction,
                 createdAt: transaction.createdAt,
+                paymentAmount: transaction.paymentAmount,
+                isPaid: transaction.isPaid,
               ),
             );
           },
@@ -261,29 +293,6 @@ class _DebtInfoDetail extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            SizedBox(height: 20.h),
-            const _DebtInfo(),
-            SizedBox(height: 20.h),
-            const RecentTransactionHeader(),
-            const RecentTransactionList(),
-            SizedBox(height: 20.h),
-          ],
-        ),
-      ),
     );
   }
 }

@@ -28,52 +28,57 @@ class PersonPage extends StatelessWidget {
   }
 }
 
-class PersonList extends StatelessWidget {
+class PersonList extends ConsumerWidget {
   const PersonList({
     super.key,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Expanded(
       child: Stack(
         children: [
-          Consumer(
-            builder: (context, ref, child) {
-              final futurePerson = ref.watch(personNotifier);
-              return futurePerson.asyncItems.when(
-                data: (persons) {
-                  return GridView.builder(
-                    padding: const EdgeInsets.only(
-                      bottom: 60.0,
-                      left: 16.0,
-                      right: 16.0,
-                    ),
-                    itemCount: persons.length,
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 16.0,
-                      mainAxisSpacing: 16.0,
-                    ),
-                    itemBuilder: (context, index) {
-                      final person = persons[index];
-                      return PersonListItem(person: person);
-                    },
-                  );
-                },
-                error: (error, stackTrace) {
-                  return Center(
-                    child: Text(error.toString()),
-                  );
-                },
-                loading: () {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                },
-              );
+          RefreshIndicator(
+            onRefresh: () async {
+              ref.invalidate(personNotifier);
             },
+            child: Builder(
+              builder: (_) {
+                final futurePerson = ref.watch(personNotifier);
+                return futurePerson.asyncItems.when(
+                  data: (persons) {
+                    return GridView.builder(
+                      padding: const EdgeInsets.only(
+                        bottom: 60.0,
+                        left: 16.0,
+                        right: 16.0,
+                      ),
+                      itemCount: persons.length,
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 16.0,
+                        mainAxisSpacing: 16.0,
+                      ),
+                      itemBuilder: (context, index) {
+                        final person = persons[index];
+                        return PersonListItem(person: person);
+                      },
+                    );
+                  },
+                  error: (error, stackTrace) {
+                    return Center(
+                      child: Text(error.toString()),
+                    );
+                  },
+                  loading: () {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  },
+                );
+              },
+            ),
           ),
           Positioned(
             right: 10,

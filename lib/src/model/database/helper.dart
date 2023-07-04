@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:drift/drift.dart';
 
 import '../../utils/enums.dart';
@@ -315,53 +313,72 @@ class DatabaseHelper {
   Future<List<TransactionModel>> getAllTransaction(
     TransactionFilterModel filter,
   ) async {
-    final isBiggerThanStartDate = database.transactionTable.startDate
-        .isBiggerOrEqualValue(filter.startDate);
-    final isSmallerThanEndDate =
-        database.transactionTable.endDate.isSmallerOrEqualValue(filter.endDate);
+    final query = database.customSelect(
+      """
+    SELECT 
+      t.id,
+      t.title,
+      t.type,
+      t.amount,
+      t.description,
+      t.start_date,
+      t.end_date,
+      t.created_at,
+      t.updated_at,
+      p.id as person_id,
+      p.name as person_name,
+      (SELECT SUM(amount) FROM payment WHERE transaction_id = t.id) as payment_amount
+    FROM "transaction" t
+    INNER JOIN person p ON p.id = t.person_id
+    WHERE t.id IS NOT NULL AND t.start_date >= ? AND t.end_date <= ? 
 
-    var query = database.select(database.transactionTable).join([
-      innerJoin(
+    ORDER BY t.updated_at DESC
+    LIMIT 5
+""",
+      variables: [
+        Variable.withDateTime(filter.startDate),
+        Variable.withDateTime(filter.endDate),
+      ],
+      readsFrom: {
+        database.transactionTable,
         database.personTable,
-        database.personTable.id.equalsExp(
-          database.transactionTable.personId,
-        ),
-      )
-    ])
-      ..orderBy([OrderingTerm.desc(database.transactionTable.updatedAt)])
-      ..where(isBiggerThanStartDate & isSmallerThanEndDate);
-
-    log("Filter Type: ${filter.startDate} - ${filter.endDate}");
-    if (filter.typeTransaction != null) {
-      query.where(
-        database.transactionTable.type.equals(
-          filter.typeTransaction == TypeTransaction.hutang
-              ? "hutang"
-              : "piutang",
-        ),
-      );
-    }
+      },
+    );
 
     final result = await query.get();
 
     final mapping = result.map(
       (e) {
-        final transaction = e.readTable(database.transactionTable);
-        final person = e.readTable(database.personTable);
+        final id = e.read<int>("id");
+        final personId = e.read<int>("person_id");
+        final title = e.read<String>("title");
+        final amount = e.read<double>("amount");
+        final description = e.read<String?>("description");
+        final startDate = e.read<DateTime>("start_date");
+        final endDate = e.read<DateTime>("end_date");
+        final createdAt = e.read<DateTime>("created_at");
+        final updatedAt = e.read<DateTime>("updated_at");
+        final personName = e.read<String>("person_name");
+        final typeTransaction = e.read<String>("type") == "hutang"
+            ? TypeTransaction.hutang
+            : TypeTransaction.piutang;
+        final paymentAmount = e.read<double?>("payment_amount") ?? 0;
+        final isPaidOff = amount == paymentAmount;
+
         return TransactionModel(
-          id: transaction.id,
-          personId: transaction.personId,
-          title: transaction.title,
-          amount: transaction.amount,
-          description: transaction.description,
-          startDate: transaction.startDate,
-          endDate: transaction.endDate,
-          typeTransaction: transaction.type == "hutang"
-              ? TypeTransaction.hutang
-              : TypeTransaction.piutang,
-          createdAt: transaction.createdAt,
-          updatedAt: transaction.updatedAt,
-          personName: person.name,
+          id: id,
+          personId: personId,
+          title: title,
+          amount: amount,
+          description: description,
+          startDate: startDate,
+          endDate: endDate,
+          typeTransaction: typeTransaction,
+          createdAt: createdAt,
+          updatedAt: updatedAt,
+          personName: personName,
+          isPaid: isPaidOff,
+          paymentAmount: paymentAmount,
         );
       },
     ).toList();
@@ -374,42 +391,70 @@ class DatabaseHelper {
     required TypeTransaction type,
   }) async {
     final isHutang = type == TypeTransaction.hutang;
-    final query = database.select(database.transactionTable).join([
-      innerJoin(
+    final query = database.customSelect(
+      """
+    SELECT 
+      t.id,
+      t.title,
+      t.type,
+      t.amount,
+      t.description,
+      t.start_date,
+      t.end_date,
+      t.created_at,
+      t.updated_at,
+      p.id as person_id,
+      p.name as person_name,
+      (SELECT SUM(amount) FROM payment WHERE transaction_id = t.id) as payment_amount
+    FROM "transaction" t
+    INNER JOIN person p ON p.id = t.person_id
+    WHERE t.type = ? AND t.person_id = ?
+    ORDER BY t.updated_at DESC
+    LIMIT 5
+""",
+      variables: [
+        Variable.withString(isHutang ? "hutang" : "piutang"),
+        Variable.withInt(personId),
+      ],
+      readsFrom: {
+        database.transactionTable,
         database.personTable,
-        database.personTable.id.equalsExp(
-          database.transactionTable.personId,
-        ),
-      )
-    ])
-      ..where(database.transactionTable.type
-          .equals(isHutang ? "hutang" : "piutang"))
-      ..where(database.transactionTable.personId.equals(personId))
-      ..orderBy(
-        [
-          OrderingTerm.desc(database.transactionTable.updatedAt),
-        ],
-      );
+      },
+    );
 
     final result = await query.get();
     final mapping = result.map(
       (e) {
-        final transaction = e.readTable(database.transactionTable);
-        final person = e.readTable(database.personTable);
+        final id = e.read<int>("id");
+        final personId = e.read<int>("person_id");
+        final title = e.read<String>("title");
+        final amount = e.read<double>("amount");
+        final description = e.read<String?>("description");
+        final startDate = e.read<DateTime>("start_date");
+        final endDate = e.read<DateTime>("end_date");
+        final createdAt = e.read<DateTime>("created_at");
+        final updatedAt = e.read<DateTime>("updated_at");
+        final personName = e.read<String>("person_name");
+        final typeTransaction = e.read<String>("type") == "hutang"
+            ? TypeTransaction.hutang
+            : TypeTransaction.piutang;
+        final paymentAmount = e.read<double?>("payment_amount") ?? 0;
+        final isPaidOff = amount == paymentAmount;
+
         return TransactionModel(
-          id: transaction.id,
-          personId: transaction.personId,
-          title: transaction.title,
-          amount: transaction.amount,
-          description: transaction.description,
-          startDate: transaction.startDate,
-          endDate: transaction.endDate,
-          typeTransaction: transaction.type == "hutang"
-              ? TypeTransaction.hutang
-              : TypeTransaction.piutang,
-          createdAt: transaction.createdAt,
-          updatedAt: transaction.updatedAt,
-          personName: person.name,
+          id: id,
+          personId: personId,
+          title: title,
+          amount: amount,
+          description: description,
+          startDate: startDate,
+          endDate: endDate,
+          typeTransaction: typeTransaction,
+          createdAt: createdAt,
+          updatedAt: updatedAt,
+          personName: personName,
+          isPaid: isPaidOff,
+          paymentAmount: paymentAmount,
         );
       },
     ).toList();
@@ -418,40 +463,65 @@ class DatabaseHelper {
   }
 
   Future<List<TransactionModel>> getRecentTransaction() async {
-    final query = database.select(database.transactionTable).join([
-      innerJoin(
+    final query = database.customSelect(
+      """
+    SELECT 
+      t.id,
+      t.title,
+      t.type,
+      t.amount,
+      t.description,
+      t.start_date,
+      t.end_date,
+      t.created_at,
+      t.updated_at,
+      p.id as person_id,
+      p.name as person_name,
+      (SELECT SUM(amount) FROM payment WHERE transaction_id = t.id) as payment_amount
+    FROM "transaction" t
+    INNER JOIN person p ON p.id = t.person_id
+    ORDER BY t.updated_at DESC
+    LIMIT 5
+""",
+      readsFrom: {
+        database.transactionTable,
         database.personTable,
-        database.personTable.id.equalsExp(
-          database.transactionTable.personId,
-        ),
-      )
-    ])
-      ..orderBy(
-        [
-          OrderingTerm.desc(database.transactionTable.updatedAt),
-        ],
-      )
-      ..limit(5);
+      },
+    );
 
     final result = await query.get();
     final mapping = result.map(
       (e) {
-        final transaction = e.readTable(database.transactionTable);
-        final person = e.readTable(database.personTable);
+        final id = e.read<int>("id");
+        final personId = e.read<int>("person_id");
+        final title = e.read<String>("title");
+        final amount = e.read<double>("amount");
+        final description = e.read<String?>("description");
+        final startDate = e.read<DateTime>("start_date");
+        final endDate = e.read<DateTime>("end_date");
+        final createdAt = e.read<DateTime>("created_at");
+        final updatedAt = e.read<DateTime>("updated_at");
+        final personName = e.read<String>("person_name");
+        final typeTransaction = e.read<String>("type") == "hutang"
+            ? TypeTransaction.hutang
+            : TypeTransaction.piutang;
+        final paymentAmount = e.read<double?>("payment_amount") ?? 0;
+        final isPaidOff = amount == paymentAmount;
+
         return TransactionModel(
-          id: transaction.id,
-          personId: transaction.personId,
-          title: transaction.title,
-          amount: transaction.amount,
-          description: transaction.description,
-          startDate: transaction.startDate,
-          endDate: transaction.endDate,
-          typeTransaction: transaction.type == "hutang"
-              ? TypeTransaction.hutang
-              : TypeTransaction.piutang,
-          createdAt: transaction.createdAt,
-          updatedAt: transaction.updatedAt,
-          personName: person.name,
+          id: id,
+          personId: personId,
+          title: title,
+          amount: amount,
+          description: description,
+          startDate: startDate,
+          endDate: endDate,
+          typeTransaction: typeTransaction,
+          createdAt: createdAt,
+          updatedAt: updatedAt,
+          personName: personName,
+          isPaid: isPaidOff,
+          paymentAmount: paymentAmount,
         );
       },
     ).toList();

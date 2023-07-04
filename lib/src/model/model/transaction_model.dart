@@ -15,6 +15,8 @@ class TransactionModel extends Equatable {
   final DateTime createdAt;
   final DateTime updatedAt;
   final String personName;
+  final double paymentAmount;
+  final bool isPaid;
 
   const TransactionModel({
     required this.id,
@@ -28,6 +30,8 @@ class TransactionModel extends Equatable {
     required this.createdAt,
     required this.updatedAt,
     required this.personName,
+    required this.paymentAmount,
+    required this.isPaid,
   });
 
   @override
@@ -44,6 +48,8 @@ class TransactionModel extends Equatable {
       createdAt,
       updatedAt,
       personName,
+      paymentAmount,
+      isPaid,
     ];
   }
 
@@ -62,6 +68,8 @@ class TransactionModel extends Equatable {
     DateTime? createdAt,
     DateTime? updatedAt,
     String? personName,
+    double? paymentAmount,
+    bool? isPaid,
   }) {
     return TransactionModel(
       id: id ?? this.id,
@@ -75,6 +83,8 @@ class TransactionModel extends Equatable {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       personName: personName ?? this.personName,
+      paymentAmount: paymentAmount ?? this.paymentAmount,
+      isPaid: isPaid ?? this.isPaid,
     );
   }
 }
