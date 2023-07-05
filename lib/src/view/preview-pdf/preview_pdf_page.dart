@@ -17,6 +17,7 @@ class PreviewPDFPage extends StatefulWidget {
 }
 
 class _PreviewPDFPageState extends State<PreviewPDFPage> {
+  final uniqPDFFileName = "report-${DateTime.now().millisecondsSinceEpoch}.pdf";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,6 +26,7 @@ class _PreviewPDFPageState extends State<PreviewPDFPage> {
       ),
       body: PdfPreview(
         build: (format) => widget.file.readAsBytes(),
+        pdfFileName: uniqPDFFileName,
       ),
     );
   }
