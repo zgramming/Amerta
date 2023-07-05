@@ -1,20 +1,24 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:equatable/equatable.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../model/model/person_filter_model.dart';
 import '../model/model/person_model.dart';
 import '../model/repository/person_repository.dart';
 
 class PersonNotifier extends StateNotifier<PersonState> {
   final PersonRepository repository;
+  final PersonFilterModel filter;
   PersonNotifier({
     required this.repository,
+    required this.filter,
   }) : super(const PersonState()) {
     getAll();
   }
 
   Future<void> getAll() async {
     state = state.copyWith(asyncItems: const AsyncLoading());
-    final result = await repository.getAll();
+    final result = await repository.getAll(filter: filter);
     result.fold(
       (failure) => state =
           state.copyWith(asyncItems: AsyncError(failure, StackTrace.current)),

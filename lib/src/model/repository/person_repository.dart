@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 
 import '../../utils/failure.dart';
+import '../model/person_filter_model.dart';
 import '../model/person_model.dart';
 import '../model/person_summary_transaction_model.dart';
 import '../service/person_service.dart';
@@ -11,9 +12,11 @@ class PersonRepository {
     required this.service,
   });
 
-  Future<Either<Failure, List<PersonModel>>> getAll() async {
+  Future<Either<Failure, List<PersonModel>>> getAll({
+    required PersonFilterModel filter,
+  }) async {
     try {
-      final result = await service.getAll();
+      final result = await service.getAll(filter: filter);
       return Right(result);
     } catch (e) {
       return Left(CommonFailure(e.toString()));

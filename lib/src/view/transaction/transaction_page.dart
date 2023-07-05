@@ -5,7 +5,9 @@ import 'package:go_router/go_router.dart';
 import '../../injection.dart';
 import '../../utils/routers.dart';
 import '../../utils/styles.dart';
+import '../../view_model/shared/shared_provider.dart';
 import '../widgets/transaction_list_item.dart';
+import 'widgets/modal_print_transaction.dart';
 import 'widgets/modal_transaction_filter.dart';
 
 class TransactionPage extends StatelessWidget {
@@ -17,7 +19,7 @@ class TransactionPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          TransactionHeader(),
+          _TransactionHeader(),
           TransactionList(),
         ],
       ),
@@ -93,13 +95,11 @@ class TransactionList extends ConsumerWidget {
   }
 }
 
-class TransactionHeader extends StatelessWidget {
-  const TransactionHeader({
-    super.key,
-  });
+class _TransactionHeader extends ConsumerWidget {
+  const _TransactionHeader();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Row(
@@ -112,7 +112,22 @@ class TransactionHeader extends StatelessWidget {
               ),
               keyboardType: TextInputType.text,
               textInputAction: TextInputAction.search,
+              onFieldSubmitted: (value) {
+                ref
+                    .read(transactionFilterProvider.notifier)
+                    .update((state) => state.copyWith(searchQuery: value));
+              },
             ),
+          ),
+          const SizedBox(height: 10.0),
+          IconButton(
+            onPressed: () async {
+              await showModalBottomSheet(
+                  context: context,
+                  backgroundColor: Colors.transparent,
+                  builder: (context) => const ModalPrintTransaction());
+            },
+            icon: const Icon(Icons.print),
           ),
           const SizedBox(height: 10.0),
           IconButton(

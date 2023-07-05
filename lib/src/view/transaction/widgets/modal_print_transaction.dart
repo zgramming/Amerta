@@ -9,8 +9,8 @@ import '../../../utils/functions.dart';
 import '../../../utils/routers.dart';
 import '../../widgets/print_transaction_tile.dart';
 
-class ModalPrintTransactionPerson extends ConsumerWidget {
-  const ModalPrintTransactionPerson({
+class ModalPrintTransaction extends ConsumerWidget {
+  const ModalPrintTransaction({
     super.key,
   });
 

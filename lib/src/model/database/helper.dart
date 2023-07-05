@@ -6,6 +6,7 @@ import '../model/form_transaction_model.dart';
 import '../model/payment_model.dart';
 import '../model/pdf_report_filter_model.dart';
 import '../model/pdf_report_model.dart';
+import '../model/person_filter_model.dart';
 import '../model/person_model.dart';
 import '../model/person_summary_transaction_model.dart';
 import '../model/transaction_detail_model.dart';
@@ -313,6 +314,9 @@ class DatabaseHelper {
   Future<List<TransactionModel>> getAllTransaction(
     TransactionFilterModel filter,
   ) async {
+    final isHaveFilterQuery = filter.searchQuery.isNotEmpty;
+    final filterQuery =
+        isHaveFilterQuery ? "AND (t.title LIKE ? OR p.name LIKE ?)" : "";
     final query = database.customSelect(
       """
     SELECT 
@@ -331,6 +335,7 @@ class DatabaseHelper {
     FROM "transaction" t
     INNER JOIN person p ON p.id = t.person_id
     WHERE t.id IS NOT NULL AND t.start_date >= ? AND t.end_date <= ? 
+    $filterQuery
 
     ORDER BY t.updated_at DESC
     LIMIT 5
@@ -338,6 +343,10 @@ class DatabaseHelper {
       variables: [
         Variable.withDateTime(filter.startDate),
         Variable.withDateTime(filter.endDate),
+        if (isHaveFilterQuery) ...[
+          Variable.withString("%${filter.searchQuery}%"),
+          Variable.withString("%${filter.searchQuery}%"),
+        ]
       ],
       readsFrom: {
         database.transactionTable,
@@ -687,8 +696,16 @@ class DatabaseHelper {
   }
 
   // Person Section
-  Future<List<PersonModel>> getAllPerson() async {
-    final result = await database.select(database.personTable).get();
+  Future<List<PersonModel>> getAllPerson({
+    required PersonFilterModel filter,
+  }) async {
+    final query = database.select(database.personTable);
+
+    if (filter.searchQuery.isNotEmpty) {
+      query.where((person) => person.name.like("%${filter.searchQuery}%"));
+    }
+
+    final result = await query.get();
     final mapping = result
         .map(
           (e) => PersonModel(

@@ -132,7 +132,10 @@ final transactionNotifier =
   ),
 );
 final personNotifier = StateNotifierProvider<PersonNotifier, PersonState>(
-  (ref) => PersonNotifier(repository: ref.watch(_personRepository)),
+  (ref) => PersonNotifier(
+    repository: ref.watch(_personRepository),
+    filter: ref.watch(personFilterProvider),
+  ),
 );
 
 final _pdfReportRepository = Provider(

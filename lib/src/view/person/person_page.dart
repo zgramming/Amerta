@@ -8,8 +8,8 @@ import '../../utils/fonts.dart';
 import '../../utils/functions.dart';
 import '../../utils/routers.dart';
 import '../../utils/styles.dart';
+import '../../view_model/shared/shared_provider.dart';
 import 'widgets/modal_action_person.dart';
-import 'widgets/modal_print_transaction_person.dart';
 
 class PersonPage extends StatelessWidget {
   const PersonPage({super.key});
@@ -180,11 +180,11 @@ class PersonListItem extends StatelessWidget {
   }
 }
 
-class _PersonHeader extends StatelessWidget {
+class _PersonHeader extends ConsumerWidget {
   const _PersonHeader();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Row(
@@ -197,16 +197,12 @@ class _PersonHeader extends StatelessWidget {
               ),
               keyboardType: TextInputType.text,
               textInputAction: TextInputAction.search,
+              onFieldSubmitted: (value) {
+                ref
+                    .read(personFilterProvider.notifier)
+                    .update((state) => state.copyWith(searchQuery: value));
+              },
             ),
-          ),
-          IconButton(
-            onPressed: () async {
-              await showModalBottomSheet(
-                  context: context,
-                  backgroundColor: Colors.transparent,
-                  builder: (context) => const ModalPrintTransactionPerson());
-            },
-            icon: const Icon(Icons.print),
           ),
         ],
       ),
