@@ -1,9 +1,11 @@
-import 'utils/fonts.dart';
-import 'utils/routers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:upgrader/upgrader.dart';
 
 import 'utils/colors.dart';
+import 'utils/constant.dart';
+import 'utils/fonts.dart';
+import 'utils/routers.dart';
 
 ThemeData _buildTheme(Brightness brightness) {
   final baseTheme = ThemeData();
@@ -35,6 +37,13 @@ class MyApp extends StatelessWidget {
           theme: _buildTheme(Brightness.light),
           color: primary,
           routerConfig: router,
+          builder: (context, child) {
+            return UpgradeAlert(
+              upgrader: Upgrader(minAppVersion: minVersionUpgrader),
+              navigatorKey: router.routerDelegate.navigatorKey,
+              child: child ?? const SizedBox(),
+            );
+          },
         );
       },
       // child: const WelcomePage(),
