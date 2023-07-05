@@ -26,7 +26,9 @@ Aplikasi management Hutang & Piutang support report PDF
 ## Tech Stack
 
 **Client:** Flutter
+
 **Architecture** MVVM
+
 **State Management** Riverpod
 
 ## Installation
