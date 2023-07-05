@@ -86,6 +86,15 @@ Aplikasi management Hutang & Piutang support report PDF
                 <img src="assets/screenshot/6.print-report-pdf.png" height="400"/>
             </td>
         </tr>
+         <!-- New Row -->
+        <tr>
+            <td align="center" style="font-weight:bold;">PDF Result</td>
+        </tr>
+        <tr>
+            <td align="center">
+                <img src="assets/screenshot/7.pdf-result.png" height="400"/>
+            </td>
+        </tr>
     </tbody>
 </table>
 
