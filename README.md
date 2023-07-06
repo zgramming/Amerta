@@ -89,10 +89,18 @@ Aplikasi management Hutang & Piutang support report PDF
          <!-- New Row -->
         <tr>
             <td align="center" style="font-weight:bold;">PDF Result</td>
+            <td align="center" style="font-weight:bold;">Export JSON</td>
+            <td align="center" style="font-weight:bold;">Import JSON</td>
         </tr>
         <tr>
             <td align="center">
                 <img src="assets/screenshot/7.pdf-result.png" height="400"/>
+            </td>
+            <td align="center">
+                <img src="assets/screenshot/8.export.png" height="400"/>
+            </td>
+            <td align="center">
+                <img src="assets/screenshot/9.import.png" height="400"/>
             </td>
         </tr>
     </tbody>
