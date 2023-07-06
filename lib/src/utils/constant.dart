@@ -1,3 +1,3 @@
 const pathLogo = 'assets/images/logo.png';
 
-const minVersionUpgrader = "1.3.0";
+const minVersionUpgrader = "1.4.0";
