@@ -66,9 +66,10 @@ class FunctionUtils {
   }
 
   static Future<void> showAlertDialog({
-    String title = "Error",
     required BuildContext context,
     required String message,
+    String title = "Error",
+    List<Widget>? actions,
   }) async {
     await showDialog(
       context: context,
@@ -84,12 +85,13 @@ class FunctionUtils {
               Text(message),
             ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("OK"),
-            ),
-          ],
+          actions: actions ??
+              [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("OK"),
+                ),
+              ],
         );
       },
     );
@@ -99,6 +101,7 @@ class FunctionUtils {
     String title = "Success",
     required BuildContext context,
     required String message,
+    List<Widget>? actions,
   }) async {
     await showDialog(
       context: context,
@@ -114,12 +117,13 @@ class FunctionUtils {
               Text(message),
             ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("OK"),
-            ),
-          ],
+          actions: actions ??
+              [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("OK"),
+                ),
+              ],
         );
       },
     );

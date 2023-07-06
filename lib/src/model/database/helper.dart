@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 
 import '../../utils/enums.dart';
+import '../model/export_data_model.dart';
 import '../model/form_payment_model.dart';
 import '../model/form_transaction_model.dart';
 import '../model/payment_model.dart';
@@ -21,6 +22,134 @@ class DatabaseHelper {
   const DatabaseHelper({
     required this.database,
   });
+
+  // Import Section
+  Future<String> importData(ExportDataModel data) async {
+    final result = await database.transaction(() async {
+      // Delete All Data on Database
+      await database.delete(database.personTable).go();
+      await database.delete(database.transactionTable).go();
+      await database.delete(database.paymentTable).go();
+
+      // Insert All Data
+      await database.batch((batch) {
+        batch.insertAll(
+          database.personTable,
+          data.persons
+              .map(
+                (e) => PersonTableCompanion(
+                  id: Value(e.id),
+                  name: Value(e.name),
+                  createdAt: Value(e.createdAt),
+                  updatedAt: Value(e.updatedAt),
+                ),
+              )
+              .toList(),
+        );
+
+        batch.insertAll(
+          database.transactionTable,
+          data.transactions.map(
+            (e) {
+              return TransactionTableCompanion(
+                id: Value(e.id),
+                personId: Value(e.personId),
+                title: Value(e.title),
+                amount: Value(e.amount),
+                description: Value(e.description),
+                startDate: Value(e.startDate),
+                endDate: Value(e.endDate),
+                type: Value(
+                  e.typeTransaction == TypeTransaction.hutang
+                      ? "hutang"
+                      : "piutang",
+                ),
+                createdAt: Value(e.createdAt),
+                updatedAt: Value(e.updatedAt),
+              );
+            },
+          ).toList(),
+        );
+
+        batch.insertAll(
+          database.paymentTable,
+          data.payments.map(
+            (e) {
+              return PaymentTableCompanion(
+                id: Value(e.id),
+                transactionId: Value(e.transactionId),
+                personId: Value(e.personId),
+                amount: Value(e.amount),
+                description: Value(e.description),
+                createdAt: Value(e.createdAt),
+                updatedAt: Value(e.updatedAt),
+              );
+            },
+          ).toList(),
+        );
+      });
+      return "Berhasil mengimport data, silahkan restart aplikasi";
+    });
+
+    return result;
+  }
+
+  // Export Section
+  Future<ExportDataModel> getExportedData() async {
+    final queryAllPerson = database.select(database.personTable);
+    final queryAllTransaction = database.select(database.transactionTable);
+    final queryAllPayment = database.select(database.paymentTable);
+
+    final result = await Future.wait([
+      queryAllPerson.get(),
+      queryAllTransaction.get(),
+      queryAllPayment.get(),
+    ]);
+
+    final persons = (result[0] as List<PersonTableData>)
+        .map((e) => ExportedPersonModel(
+              id: e.id,
+              name: e.name,
+              createdAt: e.createdAt,
+              updatedAt: e.updatedAt,
+            ))
+        .toList();
+    final transactions = (result[1] as List<TransactionTableData>)
+        .map((e) => ExportedTransactionModel(
+              id: e.id,
+              personId: e.personId,
+              title: e.title,
+              amount: e.amount,
+              description: e.description,
+              startDate: e.startDate,
+              endDate: e.endDate,
+              typeTransaction: e.type == "hutang"
+                  ? TypeTransaction.hutang
+                  : TypeTransaction.piutang,
+              createdAt: e.createdAt,
+              updatedAt: e.updatedAt,
+            ))
+        .toList();
+    final payments = (result[2] as List<PaymentTableData>)
+        .map((e) => ExportedPaymentModel(
+              id: e.id,
+              transactionId: e.transactionId,
+              personId: e.personId,
+              amount: e.amount,
+              description: e.description,
+              createdAt: e.createdAt,
+              updatedAt: e.updatedAt,
+            ))
+        .toList();
+
+    final model = ExportDataModel(
+      persons: persons,
+      transactions: transactions,
+      payments: payments,
+    );
+
+    return model;
+  }
 
   // PDF Report Section
 

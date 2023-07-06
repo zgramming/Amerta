@@ -45,6 +45,7 @@ class _FormPersonPageState extends ConsumerState<FormPersonPage> {
               ),
             );
         formKey.currentState?.reset();
+        nameController.clear();
       } else {
         await ref.read(personNotifier.notifier).update(
               PersonModel(

@@ -68,6 +68,9 @@ class _FormTransactionPageState extends ConsumerState<FormTransactionPage> {
         await ref.read(transactionNotifier.notifier).save(transaction);
 
         formKey.currentState?.reset();
+        titleController.clear();
+        descriptionController.clear();
+        amountController.clear();
       } else {
         final transaction = FormTransactionModel(
           id: widget.id,

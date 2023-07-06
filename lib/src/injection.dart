@@ -11,14 +11,20 @@ import 'model/model/person_summary_transaction_model.dart';
 import 'model/model/transaction_detail_model.dart';
 import 'model/model/transaction_model.dart';
 import 'model/model/transaction_summary_model.dart';
+import 'model/repository/export_repository.dart';
+import 'model/repository/import_repository.dart';
 import 'model/repository/payment_repository.dart';
 import 'model/repository/pdf_report_repository.dart';
 import 'model/repository/person_repository.dart';
 import 'model/repository/transaction_repository.dart';
+import 'model/service/export_service.dart';
+import 'model/service/import_service.dart';
 import 'model/service/payment_service.dart';
 import 'model/service/pdf_report_service.dart';
 import 'model/service/person_service.dart';
 import 'model/service/transaction_service.dart';
+import 'view_model/export_notifier.dart';
+import 'view_model/import_notifier.dart';
 import 'view_model/payment_notifier.dart';
 import 'view_model/pdf_report_notifier.dart';
 import 'view_model/person_notifier.dart';
@@ -112,6 +118,16 @@ final getPaymentById =
 
 // FINISH FUTURE PROVIDER SECTION
 
+final importNotifier = StateNotifierProvider<ImportNotifier, ImportState>(
+  (ref) => ImportNotifier(
+    repository: ref.watch(_importRepository),
+  ),
+);
+final exportNotifier = StateNotifierProvider<ExportNotifier, ExportState>(
+  (ref) => ExportNotifier(
+    repository: ref.watch(_exportRepository),
+  ),
+);
 final pdfReportNotifier = StateNotifierProvider<PDFReportNotifier, File?>(
   (ref) => PDFReportNotifier(
     repository: ref.watch(_pdfReportRepository),
@@ -138,6 +154,16 @@ final personNotifier = StateNotifierProvider<PersonNotifier, PersonState>(
   ),
 );
 
+final _importRepository = Provider(
+  (ref) => ImportRepository(
+    service: ref.watch(_importServiceProvider),
+  ),
+);
+final _exportRepository = Provider(
+  (ref) => ExportRepository(
+    exportService: ref.watch(_exportServiceProvider),
+  ),
+);
 final _pdfReportRepository = Provider(
   (ref) => PDFReportRepository(
     pdfReportService: ref.watch(_pdfReportServiceProvider),
@@ -155,6 +181,12 @@ final _personRepository = Provider(
   (ref) => PersonRepository(service: ref.watch(_personServiceProvider)),
 );
 
+final _importServiceProvider = Provider(
+  (ref) => ImportService(databaseHelper: ref.watch(_databaseHelper)),
+);
+final _exportServiceProvider = Provider(
+  (ref) => ExportService(databaseHelper: ref.watch(_databaseHelper)),
+);
 final _pdfReportServiceProvider = Provider((ref) => PDFReportService(
       databaseHelper: ref.watch(_databaseHelper),
     ));

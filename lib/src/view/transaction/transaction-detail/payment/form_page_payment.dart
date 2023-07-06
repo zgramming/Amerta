@@ -47,6 +47,9 @@ class _FormPagePaymentState extends ConsumerState<FormPagePayment> {
       await notifier.save(model);
 
       formKey.currentState?.reset();
+
+      _amountController.clear();
+      _descriptionController.clear();
     } else {
       final model = FormPaymentModel(
         amount: amount.isEmpty ? 0 : double.parse(amount),
