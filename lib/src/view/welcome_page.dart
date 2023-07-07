@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:upgrader/upgrader.dart';
 
+import '../utils/constant.dart';
+import '../utils/routers.dart';
 import 'home/home_page.dart';
 import 'person/person_page.dart';
 import 'setting/setting_page.dart';
@@ -47,28 +50,22 @@ class _WelcomePageState extends State<WelcomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: screens,
+    return UpgradeAlert(
+      upgrader: Upgrader(minAppVersion: minVersionUpgrader),
+      navigatorKey: router.routerDelegate.navigatorKey,
+      child: Scaffold(
+        body: IndexedStack(
+          index: _selectedIndex,
+          children: screens,
+        ),
+        bottomNavigationBar: NavigationBar(
+          destinations: destinations,
+          selectedIndex: _selectedIndex,
+          onDestinationSelected: (value) {
+            setState(() => _selectedIndex = value);
+          },
+        ),
       ),
-      bottomNavigationBar: NavigationBar(
-        destinations: destinations,
-        selectedIndex: _selectedIndex,
-        onDestinationSelected: (value) {
-          setState(() => _selectedIndex = value);
-        },
-      ),
-      // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      // floatingActionButton: FloatingActionButton(
-      //   shape: RoundedRectangleBorder(
-      //     borderRadius: BorderRadius.circular(60.0),
-      //   ),
-      //   child: const Icon(Icons.add),
-      //   onPressed: () {
-      //     context.pushNamed(formTransactionRoute);
-      //   },
-      // ),
     );
   }
 }
